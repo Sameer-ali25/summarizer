@@ -1,25 +1,25 @@
 from transformers import BartTokenizer, BartForConditionalGeneration
 
-
 def load_model():
-    model_name = "facebook/bart-large-cnn"
-    tokenizer = BartTokenizer.from_pretrained(model_name)
-    model = BartForConditionalGeneration.from_pretrained(model_name)
+    tokenizer = BartTokenizer.from_pretrained("trained_bart")
+    model = BartForConditionalGeneration.from_pretrained("trained_bart")
     return tokenizer, model
 
-
-def summarize_text(text, max_len=150, min_len=40):
+def summarize_text(text):
     tokenizer, model = load_model()
 
-    inputs = tokenizer(text, max_length=1024, return_tensors="pt", truncation=True)
+    inputs = tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512
+    )
 
     summary_ids = model.generate(
         inputs["input_ids"],
-        max_length=max_len,
-        min_length=min_len,
-        length_penalty=2.0,
-        num_beams=4,
-        early_stopping=True,
+        max_length=150,
+        min_length=40,
+        num_beams=4
     )
 
     return tokenizer.decode(summary_ids[0], skip_special_tokens=True)
